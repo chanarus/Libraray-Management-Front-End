@@ -7,42 +7,19 @@ import Page from '../../layouts/Page';
 import PageWrapper from '../../layouts/PageWrapper';
 import { Device } from '../../styles/global';
 import { getRequest } from '../../utils/httpServices';
-import Table from '../../components/Table';
+import { withRouter } from 'next/router';
 
 const Sidebar = dynamic(() => import('../../layouts/Sidebar'), {
   ssr: false
 });
 
-const librariesGridRows = [
-  {
-    id: 1,
-    title: 'Name',
-    accessor: 'name',
-    width: '20%'
-  },
-  {
-    id: 2,
-    title: 'Location',
-    accessor: 'location',
-    width: '20%'
-  },
-  {
-    id: 3,
-    title: 'Address',
-    accessor: 'address',
-    width: '40%'
-  },
-  {
-    id: 4,
-    title: 'Contact No',
-    accessor: 'contactNo',
-    width: '20%'
+const Library = ({
+  router: {
+    query: { id }
   }
-];
-
-const index = () => {
+}) => {
   const [loading, setLoading] = useState(true);
-  const [libraries, setLibraries] = useState([]);
+  const [library, setLibrary] = useState({});
 
   useEffect(() => {
     getAllLibrary();
@@ -56,9 +33,9 @@ const index = () => {
   };
 
   const getAllLibrary = async () => {
-    const res = await getRequest('http://localhost:8000/activelibrary', null);
-    const mapedData = mapTableValues(res);
-    setLibraries(mapedData);
+    const res = await getRequest(`http://localhost:8000/library/${id}`, null);
+    setLibrary(res);
+    console.log('res', res);
     setLoading(false);
   };
 
@@ -70,14 +47,47 @@ const index = () => {
       <RightContentWrapper>
         <PageWrapper>
           <PageHeader>
-            <h1>Library</h1>
+            {Object.keys(library).length !== 0 && (
+              <>
+                <h1>Library: {library.name}</h1>
+              </>
+            )}
           </PageHeader>
-          {libraries.length === 0 ? (
-            <span>No Data Found</span>
-          ) : (
-            <TableWrapper>
-              <Table columns={librariesGridRows} data={libraries} />
-            </TableWrapper>
+          {Object.keys(library).length !== 0 && (
+            <>
+              <div>
+                <div>
+                  <b>
+                    <span>Library Name: </span>
+                  </b>
+                  <span>{library.name}</span>
+                </div>
+                <div>
+                  <b>
+                    <span>Library Location: </span>
+                  </b>
+                  <span>{library.location}</span>
+                </div>
+                <div>
+                  <b>
+                    <span>Library Address: </span>
+                  </b>
+                  <span>{library.address}</span>
+                </div>
+                <div>
+                  <b>
+                    <span>Library Contact Number: </span>
+                  </b>
+                  <span>{library.contactNo}</span>
+                </div>
+                <div>
+                  <b>
+                    <span>Library Availability: </span>
+                  </b>
+                  <span>{library.active ? 'Active' : 'In Active'}</span>
+                </div>
+              </div>
+            </>
           )}
         </PageWrapper>
       </RightContentWrapper>
@@ -128,4 +138,4 @@ const PageHeader = styled.div`
   }
 `;
 
-export default index;
+export default withRouter(Library);
