@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 
@@ -6,6 +6,7 @@ import Loader from '../../components/Loader';
 import Page from '../../layouts/Page';
 import PageWrapper from '../../layouts/PageWrapper';
 import { Device } from '../../styles/global';
+import { getRequest } from '../../utils/httpServices';
 
 const Sidebar = dynamic(() => import('../../layouts/Sidebar'), {
   ssr: false
@@ -13,6 +14,17 @@ const Sidebar = dynamic(() => import('../../layouts/Sidebar'), {
 
 const index = () => {
   const [loading, setLoading] = useState(false);
+  const [libraries, setLibraries] = useState({});
+
+  useEffect(() => {
+    getAllLibrary();
+  }, []);
+
+  const getAllLibrary = async () => {
+    const res = await getRequest('http://localhost:8000/library', null);
+    console.log('res', res);
+  };
+
   return loading ? (
     <Loader />
   ) : (
