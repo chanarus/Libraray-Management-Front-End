@@ -1,0 +1,20 @@
+{
+  "presets": ["next/babel"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "shared": "./shared",
+          "static": "./static"
+        }
+      }
+    ],
+    ["inline-react-svg"],
+    [
+      "babel-plugin-styled-components",
+      { "ssr": true, "displayName": true, "preprocess": false }
+    ]
+  ]
+}
