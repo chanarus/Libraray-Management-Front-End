@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
+import Router from 'next/router';
 
 import Loader from '../../components/Loader';
 import Page from '../../layouts/Page';
 import PageWrapper from '../../layouts/PageWrapper';
+import Table from '../../components/Table';
+import Button from '../../components/Button';
+
 import { Device } from '../../styles/global';
 import { getRequest } from '../../utils/httpServices';
-import Table from '../../components/Table';
 
 const Sidebar = dynamic(() => import('../../layouts/Sidebar'), {
   ssr: false
@@ -71,6 +74,16 @@ const index = () => {
         <PageWrapper>
           <PageHeader>
             <h1>Library</h1>
+
+            <ButtonWrapper>
+              <CreateButton
+                onClick={() => {
+                  Router.push('/library/create');
+                }}
+              >
+                Create Library
+              </CreateButton>
+            </ButtonWrapper>
           </PageHeader>
           {libraries.length === 0 ? (
             <span>No Data Found</span>
@@ -84,6 +97,27 @@ const index = () => {
     </Page>
   );
 };
+
+const ButtonWrapper = styled.div`
+  display: flex;
+
+  @media ${Device.mini_desktop_below} {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  div {
+    &:nth-child(1) {
+      margin-right: 20px;
+    }
+  }
+`;
+
+const CreateButton = styled(Button)`
+  width: 170px;
+  height: 30px;
+  margin-left: 20px;
+`;
 
 const TableWrapper = styled.div`
   > span {

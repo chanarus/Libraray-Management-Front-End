@@ -3,7 +3,7 @@ import axios from 'axios';
 export const getRequest = (url, params) => {
   const requestOptions = {
     headers: {
-      Accept: 'application/json'
+      'Content-Type': 'application/json'
     },
     params
   };
@@ -21,7 +21,7 @@ export const getRequest = (url, params) => {
 export const postRequest = (url, body) => {
   const requestOptions = {
     headers: {
-      Accept: 'application/json'
+      'Content-Type': 'application/json'
     }
   };
 
@@ -38,7 +38,7 @@ export const postRequest = (url, body) => {
 export const putRequest = (url, body) => {
   const requestOptions = {
     headers: {
-      Accept: 'application/json'
+      'Content-Type': 'application/json'
     }
   };
 
@@ -55,7 +55,7 @@ export const putRequest = (url, body) => {
 export const deleteRequest = url => {
   const requestOptions = {
     headers: {
-      Accept: 'application/json'
+      'Content-Type': 'application/json'
     }
   };
 
