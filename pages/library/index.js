@@ -59,7 +59,8 @@ const index = () => {
   };
 
   const getAllLibrary = async () => {
-    const res = await getRequest('http://localhost:8000/activelibrary', null);
+    const baseUrl = process.env.LIBRARY_SERVICE;
+    const res = await getRequest(`${baseUrl}activelibrary`, null);
     const mapedData = mapTableValues(res);
     setLibraries(mapedData);
     setLoading(false);

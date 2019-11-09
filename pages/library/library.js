@@ -1,17 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
+import Router from 'next/router';
 
 import Loader from '../../components/Loader';
 import Page from '../../layouts/Page';
 import PageWrapper from '../../layouts/PageWrapper';
+import Button from '../../components/Button';
+import Table from '../../components/Table';
+
 import { Device } from '../../styles/global';
-import { getRequest } from '../../utils/httpServices';
+import { getRequest, deleteRequest } from '../../utils/httpServices';
 import { withRouter } from 'next/router';
 
 const Sidebar = dynamic(() => import('../../layouts/Sidebar'), {
   ssr: false
 });
+
+const staffGridRows = [
+  {
+    id: 1,
+    title: 'Name',
+    accessor: 'StaffName',
+    width: '20%'
+  },
+  {
+    id: 2,
+    title: 'Employee Number',
+    accessor: 'EmpNo',
+    width: '20%'
+  },
+  {
+    id: 3,
+    title: 'Address',
+    accessor: 'Address',
+    width: '40%'
+  },
+  {
+    id: 4,
+    title: 'Join Date',
+    accessor: 'JoinDate',
+    width: '20%'
+  }
+];
 
 const Library = ({
   router: {
@@ -20,9 +51,11 @@ const Library = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [library, setLibrary] = useState({});
+  const [staff, setStaff] = useState([]);
 
   useEffect(() => {
-    getAllLibrary();
+    getLibrary();
+    getUser();
   }, []);
 
   const mapTableValues = data => {
@@ -32,10 +65,26 @@ const Library = ({
     });
   };
 
-  const getAllLibrary = async () => {
-    const res = await getRequest(`http://localhost:8000/library/${id}`, null);
+  const deleteLibrary = async () => {
+    const baseUrl = process.env.LIBRARY_SERVICE;
+    const res = await deleteRequest(`${baseUrl}library/${id}`, null);
+
+    if (res.id) {
+      Router.push('/library');
+    }
+  };
+
+  const getUser = async () => {
+    const baseUrl = process.env.LIBRARY_SERVICE;
+    const res = await getRequest(`${baseUrl}library/${id}/staff`, null);
+
+    setStaff(res);
+  };
+
+  const getLibrary = async () => {
+    const baseUrl = process.env.LIBRARY_SERVICE;
+    const res = await getRequest(`${baseUrl}library/${id}`, null);
     setLibrary(res);
-    console.log('res', res);
     setLoading(false);
   };
 
@@ -50,6 +99,18 @@ const Library = ({
             {Object.keys(library).length !== 0 && (
               <>
                 <h1>Library: {library.name}</h1>
+                <ButtonWrapper>
+                  <CreateButton
+                    onClick={() => {
+                      Router.push(`/library/create?id=${id}`);
+                    }}
+                  >
+                    Edit Library
+                  </CreateButton>
+                  <DeleteButton onClick={deleteLibrary}>
+                    Delete Library
+                  </DeleteButton>
+                </ButtonWrapper>
               </>
             )}
           </PageHeader>
@@ -89,11 +150,48 @@ const Library = ({
               </div>
             </>
           )}
+
+          <h1>Staff</h1>
+          {staff.length === 0 ? (
+            <span>No Data Found</span>
+          ) : (
+            <TableWrapper>
+              <Table columns={staffGridRows} data={staff} />
+            </TableWrapper>
+          )}
         </PageWrapper>
       </RightContentWrapper>
     </Page>
   );
 };
+
+const ButtonWrapper = styled.div`
+  display: flex;
+
+  @media ${Device.mini_desktop_below} {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  div {
+    &:nth-child(1) {
+      margin-right: 20px;
+    }
+  }
+`;
+
+const CreateButton = styled(Button)`
+  width: 170px;
+  height: 30px;
+  margin-left: 20px;
+`;
+
+const DeleteButton = styled(Button)`
+  width: 170px;
+  height: 30px;
+  margin-left: 20px;
+  background-color: red;
+`;
 
 const TableWrapper = styled.div`
   > span {

@@ -9,14 +9,14 @@ import PageWrapper from '../../layouts/PageWrapper';
 import { Device } from '../../styles/global';
 import Button from '../../components/Button';
 
-import { postRequest } from '../../utils/httpServices';
+import { postRequest, getRequest, putRequest } from '../../utils/httpServices';
 import { withRouter } from 'next/router';
 
 const Sidebar = dynamic(() => import('../../layouts/Sidebar'), {
   ssr: false
 });
 
-const Library = ({
+const Create = ({
   router: {
     query: { id }
   }
@@ -30,7 +30,25 @@ const Library = ({
     active: true
   });
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log('id', id);
+    if (id !== undefined) {
+      getLibrary(id);
+    }
+  }, []);
+
+  const getLibrary = async id => {
+    setLoading(true);
+    const baseUrl = process.env.LIBRARY_SERVICE;
+    const res = await getRequest(`${baseUrl}library/${id}`, null);
+    setFormData({
+      name: res.name,
+      location: res.location,
+      address: res.address,
+      contactNo: res.contactNo
+    });
+    setLoading(false);
+  };
 
   const handleChange = evt => {
     const name = evt.target.name;
@@ -44,12 +62,23 @@ const Library = ({
   const handleSubmit = async evt => {
     evt.preventDefault();
     setLoading(true);
-    const url = 'http://localhost:8000/library';
 
-    const responce = await postRequest(url, formData);
+    if (id !== undefined) {
+      const baseUrl = process.env.LIBRARY_SERVICE;
 
-    if (responce.id) {
-      Router.push(`/library/library?id=${responce.id}`);
+      const responce = await putRequest(`${baseUrl}library/${id}`, formData);
+
+      if (responce.id) {
+        Router.push(`/library/library?id=${responce.id}`);
+      }
+    } else {
+      const baseUrl = process.env.LIBRARY_SERVICE;
+
+      const responce = await postRequest(`${baseUrl}library`, formData);
+
+      if (responce.id) {
+        Router.push(`/library/library?id=${responce.id}`);
+      }
     }
   };
 
@@ -66,13 +95,20 @@ const Library = ({
           <form onSubmit={handleSubmit}>
             <InputField>
               <Label>Name</Label>
-              <Input type='text' name='name' required onChange={handleChange} />
+              <Input
+                type='text'
+                name='name'
+                value={formData.name}
+                required
+                onChange={handleChange}
+              />
             </InputField>
             <InputField>
               <Label>Location</Label>
               <Input
                 type='text'
                 name='location'
+                value={formData.location}
                 required
                 onChange={handleChange}
               />
@@ -82,6 +118,7 @@ const Library = ({
               <Input
                 type='text'
                 name='address'
+                value={formData.address}
                 required
                 onChange={handleChange}
               />
@@ -91,13 +128,14 @@ const Library = ({
               <Input
                 type='text'
                 name='contactNo'
+                value={formData.contactNo}
                 required
                 onChange={handleChange}
               />
             </InputField>
             <ButtonWrapper>
               <CreateButton type='submit' onClick={handleSubmit}>
-                Create Library
+                {id !== undefined ? 'Edit Library' : 'Create Library'}
               </CreateButton>
             </ButtonWrapper>
           </form>
@@ -171,4 +209,4 @@ const PageHeader = styled.div`
   }
 `;
 
-export default withRouter(Library);
+export default withRouter(Create);

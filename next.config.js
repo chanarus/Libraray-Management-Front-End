@@ -6,7 +6,7 @@ const webpack = require('webpack');
 module.exports = withTM({
   transpileModules: ['common'],
   webpack(config) {
-    //config.plugins.push(new webpack.EnvironmentPlugin(localEnv));
+    config.plugins.push(new webpack.EnvironmentPlugin(localEnv));
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack']
